@@ -1,0 +1,21 @@
+div.content(style='min-height: 200px; width:800px; margin : 0px 60px;')
+  div.row(style=' margin-left: -60px;')
+    div.login-form
+     include http
+//-     ul.nav.nav-tabs
+//-      li.active
+//-        a(href='#http', data-toggle='tab') Http
+//-      li
+//-        a(href='#https', data-toggle='tab') Https
+//-     .tab-content
+//-      #http.tab-pane.active
+//-       include http
+//-      #https.tab-pane
+//-       include https
+
+#deleteRouteModal.modal.hide.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+    .modal-body
+        | Are you sure you want to delete route?
+      .modal-footer
+        button.btn(data-dismiss='modal', aria-hidden='true') Cancel
+        button.btn.btn-primary(type='submit', data-dismiss='modal', ng-click='deleteRoute()') OK
