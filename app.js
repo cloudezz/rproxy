@@ -13,10 +13,11 @@ if (cluster.isMaster) {
 	db.on('error', console.error);
 	db.once('open', function() {
 		// Run the master
-		
-		master();
 		var routeDao = require('./dao/route');
-		routeDao.updateJson();
+		routeDao.writeToJson(function(){
+			master();
+		});
+
 		var express = require('express')
 			, http = require('http')
 			, path = require('path')

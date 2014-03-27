@@ -5,6 +5,7 @@
 var login = require('../controllers/login'), route = require('../controllers/route'), target=require('../controllers/target'), home=require('../controllers/home');
 
 module.exports = function(app, passport, auth) {
+	route.init();
 	app.get('/login', login.login);
 	app.get('/', function(req, res){
 		res.redirect('/proxy');

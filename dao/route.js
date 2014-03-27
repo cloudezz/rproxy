@@ -98,7 +98,7 @@ exports.deleteById = function(id, callback) {
 	});
 };
 
-exports.updateTargetStatus = function(callback) {
+exports.writeToJson = function(callback) {
 	Route.find({}).populate({
 		path : 'targets',
 		match : {

@@ -103,7 +103,7 @@ WatchMen.prototype.ping = function (params, callback){
 		      target.status = target.state.status;
 		      targetDao.update(target, function (err, result){
 		    	  if (prev_state.status !== state.status) {
-			    	  routeDao.updateTargetStatus(target, function(error){
+			    	  routeDao.writeToJson(target, function(error){
 			    		  callback (err, state);
 			    	  });
 		    	  } else {
