@@ -42,8 +42,10 @@ MemoryMonitor.prototype.tick = function () {
     var currentMemory = process.memoryUsage().rss;
 
     if (currentMemory < memoryLimit) {
-        this.log('Memory usage is OK (' + Math.round(currentMemory / (1024 * 1024)) + 'MB)');
+       // this.log('Memory usage is OK (' + Math.round(currentMemory / (1024 * 1024)) + 'MB)');
         return;
+    } else {
+    	this.log('Memory usage is out of memorylimit (' + Math.round(currentMemory / (1024 * 1024)) + 'MB)');
     }
     // Limit reached, starting the exit phase
     this.log('Memory limit exceeded (' + Math.round(currentMemory / (1024 * 1024)) + 'MB), exiting...');
