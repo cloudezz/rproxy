@@ -17,7 +17,7 @@ if (cluster.isMaster) {
 		routeDao.writeToJson(function(){
 			master();
 		});
-
+		
 		var express = require('express')
 			, http = require('http')
 			, path = require('path')

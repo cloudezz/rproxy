@@ -98,12 +98,16 @@ WatchMen.prototype.ping = function (params, callback){
 		          self.emit('service_ok', target, state);
 		         }
 		      }
-		
+		      var isUpdateJson = false;
+		      if(!prev_state.status || prev_state.status == undefined || (prev_state.status !== state.status)){
+		    	  isUpdateJson = true;
+		      }
 		      target.state = state;
 		      target.status = target.state.status;
+		     // console.log(prev_state.status + "----------" + state.status);
 		      targetDao.update(target, function (err, result){
-		    	  if (prev_state.status !== state.status) {
-			    	  routeDao.writeToJson(target, function(error){
+		    	  if (isUpdateJson) {
+			    	  routeDao.writeToJson(function(error){
 			    		  callback (err, state);
 			    	  });
 		    	  } else {
