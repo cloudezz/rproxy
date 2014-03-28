@@ -19,7 +19,7 @@ exports.init = function() {
     }
     httpProxy.setMaxSockets(config.maxSockets);
 	
-    function readRoutesJson(){
+/*    function readRoutesJson(){
         fs.readFile("./config/routes.json", function (err, data) {
             if (err) {
           	  console.error("Error reading file");
@@ -28,13 +28,19 @@ exports.init = function() {
          });
     }
     readRoutesJson();
+    console.log("Reverse proxy is watchning routes.json file");
     fs.watchFile("./config/routes.json", function () {
     	readRoutesJson();
-    });
+    });*/
 };
 
 exports.forwardRequest = function(req, res) {
-	forward(req, res);
+	collection.get("routesJson", function(err, data){
+		if(!err){
+			routesJson = data;
+		}
+		forward(req, res);
+	});
 };
 
 function forward(req, res){
@@ -42,23 +48,27 @@ function forward(req, res){
 	if (!route) {
 		console.log("No routes found");
 	} else {
-		var target = null;
-		for(var i=0; i<route.targets.length; i++){
-			if(route.targets[i].status == 'error'){
-				route.targets.splice(i, 1);
+		collection.get(route.source, function(err, routeData) {
+			if (err) {
+				console.error('There was an error in collection.get.');
+			} else {
+				route = routeData;
 			}
-		}
-
-		if (route.targets.length > 1) {
-			var cookie = req.headers.cookie;
-			if (route.sessionType == "Non Sticky" || cookie == undefined) {
-
-				collection.get(route.source, function(err, routeData) {
-					if (err) {
-						console.error('There was an error in collection.get.');
-					} else {
-						route = routeData;
-					}
+			var target = null;
+			for(var i=0; i<route.targets.length; i++){
+				if(route.targets[i].dead){
+					route.targets.splice(i, 1);
+				}
+			}
+			
+			if (route.targets.length > 1) {
+				var cookie = req.headers.cookie;
+				var serverId = null;
+				if(cookie){
+					var cookieJson = parseCookies(req);
+					serverId = cookieJson['SERVERID'];
+				}
+				if (route.sessionType == "Non Sticky" || !serverId) {
 					target = route.targets[0];
 
 					route.targets.splice(0, 1);
@@ -77,23 +87,21 @@ function forward(req, res){
 						}
 						proxyRequest(req, res, target);
 					});
-				});
-			} else if (route.sessionType == "Sticky") {
-				var cookieJson = parseCookies(req);
-				var serverId = cookieJson['SERVERID'];
-				var values = serverId.split(":");
-				var persistedHost = values[0];
-				var persistedPort = values[1];
-				var target = {
-					host : persistedHost,
-					port : persistedPort
-				};
+				} else if (route.sessionType == "Sticky") {
+					var values = serverId.split(":");
+					var persistedHost = values[0];
+					var persistedPort = values[1];
+					var target = {
+						host : persistedHost,
+						port : persistedPort
+					};
+					proxyRequest(req, res, target);
+				}
+			} else if(route.targets.length == 1) {
+				var target = route.targets[0];
 				proxyRequest(req, res, target);
 			}
-		} else if(route.targets.length == 1) {
-			var target = route.targets[0];
-			proxyRequest(req, res, target);
-		}
+		});
 	}
 }
 
@@ -111,6 +119,7 @@ function proxyRequest(req, res, target) {
     });*/
     // TODO proxy.on('start', startHandler);
 }
+
 
 function getRoute(req){
 	var url = decodeURI(req.url).toLowerCase(), route = null;

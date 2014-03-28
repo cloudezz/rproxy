@@ -8,7 +8,7 @@ var TargetSchema = new Schema({
 	host : String,
 	port : String,
 	source : {},
-	status : String,
+	dead : Boolean,
 	config : {
 		enabled : Boolean,
 		ping_service : String,

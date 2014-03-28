@@ -213,15 +213,15 @@ exports.deleteRoute = function(req, res){
 					var options = {oldSource : result.source};
 					startServer(options);
 					var targets = result.targets;
-					async.eachSeries(targets, function(target, done){
+					async.each(targets, function(target, done){
 						targetsDao.deleteById(target._id, function(error, data){
 							if(error){
-								done("Error", null);
+								done("Error");
 							} else {
-								done(null, deletedData);
+								done(null);
 							}
 						});
-					}, function(err, data){
+					}, function(err){
 						if(err){
 							res.send(err);
 						} else {
@@ -248,15 +248,15 @@ exports.deleteRouteBySource = function(req, res){
 						var options = {oldSource : result.source};
 						startServer(options);
 						var targets = result.targets;
-						async.eachSeries(targets, function(target, done){
+						async.each(targets, function(target, done){
 							targetsDao.deleteById(target._id, function(error, data){
 								if(error){
-									done("Error", null);
+									done("Error");
 								} else {
-									done(null, deletedData);
+									done(null);
 								}
 							});
-						}, function(err, data){
+						}, function(err){
 							if(err){
 								res.send(err);
 							} else {
@@ -300,17 +300,17 @@ function saveRoute(req, res, route){
 			var config = {enabled : false, ping_service : "", timeout : "", ping_interval : "",
 					alert_to : "", warning_if_takes_more_than : "", method : "",
 						url : "", expectedStatuscode : "", expectedData : ""};
-			async.eachSeries(targets, function(target, done){
+			async.each(targets, function(target, done){
 				var targetToSave = {host : target.host, port : target.port, source : route.source, config : config, state : {}};
 				targetsDao.save(targetToSave, function(error, data){
 					if(error){
-						done(error, null);
+						done(error);
 					} else {
 						jsonData.targets.push(data);
-						done(null, data);
+						done(null);
 					}
 				});
-			}, function(err, data){
+			}, function(err){
 				if(err){
 					res.send(err);
 				} else {
@@ -357,7 +357,7 @@ function updateRoute(req, res, route, oldRoute){
 		} 
 	}
 
-	async.eachSeries(newTargets, function(newTarget, done){
+	async.each(newTargets, function(newTarget, done){
 		targetsDao.findById(newTarget._id, function(error, target){
 			if(target){
 				target.host = newTarget.host;
@@ -394,7 +394,7 @@ function updateRoute(req, res, route, oldRoute){
 				if(error){
 					res.send(error);
 				} else {
-					async.eachSeries(targetsToRemove, function(targetToRemove, done){
+					async.each(targetsToRemove, function(targetToRemove, done){
 						targetsDao.deleteById(targetToRemove._id, function(error, data){
 							if(error){
 								done(error);

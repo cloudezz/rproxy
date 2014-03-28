@@ -14,7 +14,6 @@ exports.updateTargetConfig = function(req, res){
 				if(error){
 					res.send({error : error});
 				} else {
-					targetsDao.updateJson();
 					res.send({id : data._id});
 				}
 			});

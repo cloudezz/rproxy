@@ -1,4 +1,5 @@
-var events = require('events'), fs = require('fs'), http = require('./ping/http'), targetDao = require('../dao/target'), routeDao = require('../dao/route');
+var events = require('events'), fs = require('fs'), http = require('./ping/http'), targetDao = require('../dao/target'), routeDao = require('../dao/route'),
+             collection = require('strong-store-cluster').collection('routes');
 
 function WatchMen(){
   this.daemon_status = 0; //0=stopped, 1=running
@@ -103,12 +104,29 @@ WatchMen.prototype.ping = function (params, callback){
 		    	  isUpdateJson = true;
 		      }
 		      target.state = state;
-		      target.status = target.state.status;
+		      if(target.state.status == "success"){
+		    	  target.dead = false;
+		      } else {
+		    	  target.dead = true;
+		      }
 		     // console.log(prev_state.status + "----------" + state.status);
 		      targetDao.update(target, function (err, result){
 		    	  if (isUpdateJson) {
-			    	  routeDao.writeToJson(function(error){
-			    		  callback (err, state);
+			    	  collection.get(target.source, function(err, value){
+			    		  if(value){
+				    		  var targets = value.targets;
+				    		  for(var i=0; i<targets.length; i++){
+				    			 if(targets[i].host == target.host && targets[i].port == target.port){
+				    				 targets[i].dead = target.dead;
+				    			 }
+				    		  }
+				    		  value.targets = targets;
+				    		  collection.set(value.source, value, function(error){
+				    			  callback (err, state);
+				    		  });
+			    		  } else {
+			    			  callback (err, state);
+			    		  }
 			    	  });
 		    	  } else {
 		    		  callback (err, state);
@@ -144,6 +162,7 @@ WatchMen.prototype.start = function (){
 	  });
  }
  
+ console.log("Watchmen is watchning targets.json file");
  fs.watchFile("./config/targets.json", function () {
 	 count++;
 	 for(var i=0; i<timeoutIDs.length; i++){

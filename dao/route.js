@@ -16,13 +16,7 @@ var RouteSchema = new Schema({
 var Route = mongoose.model('Route', RouteSchema);
 
 var updateRoutesJson = function() {
-	Route.find({}).populate({
-		path : 'targets',
-		match : {
-			status : 'success'
-		},
-		select : 'host port status'
-	}).exec(function(err, result) {
+	Route.find({}).populate('targets', 'host port dead').exec(function(err, result) {
 		routesJson = {};
 		if (result && result != null) {
 			for ( var i = 0; i < result.length; i++) {
@@ -59,7 +53,7 @@ exports.update = function(route, callback) {
 };
 
 exports.findById = function(id, callback) {
-	Route.findById(id).populate('targets', 'host port status').exec(
+	Route.findById(id).populate('targets', 'host port dead').exec(
 			function(err, doc) {
 				callback(err, doc);
 			});
@@ -80,7 +74,7 @@ exports.find = function(json, callback) {
 };
 
 exports.getAll = function(callback) {
-	Route.find({}).populate('targets', 'host port status').exec(
+	Route.find({}).populate('targets', 'host port dead').exec(
 			function(err, routes) {
 				callback(err, routes);
 			});
@@ -99,13 +93,7 @@ exports.deleteById = function(id, callback) {
 };
 
 exports.writeToJson = function(callback) {
-	Route.find({}).populate({
-		path : 'targets',
-		match : {
-			status : 'success'
-		},
-		select : 'host port status'
-	}).exec(function(err, result) {
+	Route.find({}).populate('targets', 'host port dead').exec(function(err, result) {
 		routesJson = {};
 		if (result && result != null) {
 			for ( var i = 0; i < result.length; i++) {
