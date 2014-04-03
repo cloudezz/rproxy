@@ -2,9 +2,10 @@
  * Request Mappings
  */
 
-var login = require('../controllers/login'), route = require('../controllers/route'), target=require('../controllers/target'), home=require('../controllers/home');
+var login = require('../controllers/login'), route = require('../controllers/route'), target=require('../controllers/target'),
+	home=require('../controllers/home'), passport = require('passport');
 
-module.exports = function(app, passport, auth) {
+module.exports = function(app, auth) {
 	route.init();
 	app.get('/login', login.login);
 	app.get('/', function(req, res){

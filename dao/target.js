@@ -58,7 +58,7 @@ var updateTargetsJson = function() {
 				if (err) {
 					console.log(err);
 				} else {
-					console.log("The file is saved!");
+					console.log("targets.json file is saved!");
 				}
 			});
 		}

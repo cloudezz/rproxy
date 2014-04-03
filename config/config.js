@@ -5,8 +5,9 @@
 module.exports = {
 	maxSockets : 500,
 	//workers : 4,
-	tcpTimeout : 90,
+	tcpTimeout : 30,
 	httpKeepAlive : true,
+	deadBackendTTL : 5000, //milliseconds
 	//UI
 	app : {
 		name : 'proxy-etc',

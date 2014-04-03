@@ -20,28 +20,17 @@ if (cluster.isMaster) {
 		
 		var express = require('express')
 			, http = require('http')
-			, path = require('path')
-			, passport = require('passport')
-		    , app = express();
+		    , app = express()
+		    , auth = require('./config/auth')();
 
-		var expressConfig = require('./config/express');
-		expressConfig(app, express, path, __dirname, passport, config);
-
-		var passportConf = require('./config/passport');
-		passportConf(passport, config);
-
-		var auth = require('./config/auth')(passport, express);
-
-		var reqmap = require('./config/reqmap');
-		reqmap(app, passport, auth);
-	    
-		var httpServer = http.createServer(app);
+		require('./config/express')(app, __dirname);
+		require('./config/passport')();
+		require('./config/reqmap')(app, auth);
 		
+		var httpServer = http.createServer(app);
 		httpServer.listen(config.app.port, config.app.hostname, function(req,
 				res, next) {
-			console.log('Http server on port : ' + config.app.port);
-
-			
+			console.log('Http server on port : ' + config.app.port);	
 		});
 	});
 	mongoose.connect(config.databaseURL);

@@ -10,8 +10,7 @@ var cluster = require('cluster'),
     config = require('../config/config'),
     async = require('async'),
     email = require('../watchmen/email'),
-    WatchMen = require('../watchmen/watchmen'),
-    OldRoutes = {};
+    WatchMen = require('../watchmen/watchmen');
 
 function Master() {
     if (!(this instanceof Master)) {
@@ -54,14 +53,16 @@ function Master() {
 }
 
 Master.prototype.readRoutesJson = function(){
+	console.log("Refreshing cluster collection");
+	var self = this;
     fs.readFile("./config/routes.json", function (err, data) {
         if (err) {
       	  console.error("Error reading file");
 		} else {
 		    var routesArray = [];
-			if (OldRoutes) {
-				for ( var key in OldRoutes) {
-					routesArray.push(OldRoutes[key]);
+			if (self.OldRoutes) {
+				for ( var key in self.OldRoutes) {
+					routesArray.push(self.OldRoutes[key]);
 				}
 			}
 
@@ -77,7 +78,7 @@ Master.prototype.readRoutesJson = function(){
 			}, function(err){
 				if (data && data != undefined && data != null) {
 					var routes = JSON.parse(data);
-					OldRoutes = routes;
+					self.OldRoutes = routes;
 					collection.set("routesJson", routes, function(err) {
 						if (err) {
 							console.error('There was an error');

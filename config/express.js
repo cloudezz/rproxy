@@ -2,7 +2,9 @@
  * Initialization of application
  */
 
-module.exports = function(app, express, path, dirname, passport, config) {
+var express = require('express'), passport = require('passport'), config = require('../config/config'), path = require('path');
+
+module.exports = function(app, dirname) {
 
 	// all environments
 	app.set('port', process.env.PORT || config.app.port);

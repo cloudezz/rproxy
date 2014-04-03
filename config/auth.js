@@ -2,7 +2,9 @@
  * Authentication
  */
 
-module.exports = function(passport, express) {
+var express = require('express'), passport = require('passport');
+
+module.exports = function() {
 	return [ express.json(), express.urlencoded(), isAuthenticated ];
 };
 

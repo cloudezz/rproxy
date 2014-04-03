@@ -9,9 +9,16 @@ var runningServers = [];
 var http = require('http');
 var config = require('../config/config');
 var httpProxy = require("http-proxy");
-var proxy = new httpProxy.RoutingProxy();
+var proxy;
 
 exports.init = function() {
+	var options = {};
+    if (config.httpKeepAlive !== true) {
+        // Disable the http Agent of the http-proxy library so we force
+        // the proxy to close the connection after each request to the backend
+        options.agent = false;
+    }
+	proxy = httpProxy.createProxyServer(options);
 	startServers();
 };
 
@@ -115,7 +122,7 @@ exports.add = function(req, res){
 						alert_to : "", warning_if_takes_more_than : "", method : "",
 							url : "", expectedStatuscode : "", expectedData : ""};
 				if(oldRoute != null){
-					var targetToSave = {host : target.host, port : target.port, source : oldRoute.source, config : config, state : {}};
+					var targetToSave = {host : target.host, port : target.port, source : oldRoute.source, config : config, state : {}, dead : false};
 					targetsDao.save(targetToSave, function(error, data){
 						if(error){
 							done("Error", null);
@@ -301,7 +308,7 @@ function saveRoute(req, res, route){
 					alert_to : "", warning_if_takes_more_than : "", method : "",
 						url : "", expectedStatuscode : "", expectedData : ""};
 			async.each(targets, function(target, done){
-				var targetToSave = {host : target.host, port : target.port, source : route.source, config : config, state : {}};
+				var targetToSave = {host : target.host, port : target.port, source : route.source, config : config, state : {}, dead : false};
 				targetsDao.save(targetToSave, function(error, data){
 					if(error){
 						done(error);
@@ -371,7 +378,7 @@ function updateRoute(req, res, route, oldRoute){
 					}
 				});
 			} else {
-				var targetToSave = {host : newTarget.host, port : newTarget.port, source:route.source, config : config, state : {}};
+				var targetToSave = {host : newTarget.host, port : newTarget.port, source:route.source, config : config, state : {}, dead : false};
 				targetsDao.save(targetToSave, function(error, data){
 					if(error){
 						done("Error");
@@ -437,8 +444,16 @@ function startServer(options){
 }
 
 function portForward(req, res){
-	var host = {host : config.http.hostname, port : config.http.port};
-	proxy.proxyRequest(req, res, host);
+	//var host = {host : config.http.hostname, port : config.http.port};
+	
+    proxy.web(req, res, {
+        target: {
+            host: config.http.hostname,
+            port: config.http.port
+        },
+        xfwd: false
+    });
+	//proxy.proxyRequest(req, res, host);
 }
 
 

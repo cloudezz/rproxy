@@ -2,11 +2,12 @@
  * Passport configuration for authentication
  */
 
+var passport = require('passport'), config = require('../config/config');
 var LocalStrategy = require('passport-local').Strategy;
 var BasicStrategy = require('passport-http').BasicStrategy;
 var userDao = require("../dao/user");
 
-module.exports = function(passport, config) {
+module.exports = function() {
 	userDao.findByRole('ADMIN_USER', function(error, result) {
 		if (result == null) {
 			var userJson = {

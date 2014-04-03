@@ -16,7 +16,7 @@ var RouteSchema = new Schema({
 var Route = mongoose.model('Route', RouteSchema);
 
 var updateRoutesJson = function() {
-	Route.find({}).populate('targets', 'host port dead').exec(function(err, result) {
+	Route.find({}).populate('targets', 'host port source dead').exec(function(err, result) {
 		routesJson = {};
 		if (result && result != null) {
 			for ( var i = 0; i < result.length; i++) {
@@ -28,7 +28,7 @@ var updateRoutesJson = function() {
 				if (err) {
 					console.log(err);
 				} else {
-					console.log("The file is saved!");
+					console.log("routes.json file is saved!");
 				}
 			});
 		}
@@ -53,7 +53,7 @@ exports.update = function(route, callback) {
 };
 
 exports.findById = function(id, callback) {
-	Route.findById(id).populate('targets', 'host port dead').exec(
+	Route.findById(id).populate('targets', 'host port source dead').exec(
 			function(err, doc) {
 				callback(err, doc);
 			});
@@ -74,7 +74,7 @@ exports.find = function(json, callback) {
 };
 
 exports.getAll = function(callback) {
-	Route.find({}).populate('targets', 'host port dead').exec(
+	Route.find({}).populate('targets', 'host port source dead').exec(
 			function(err, routes) {
 				callback(err, routes);
 			});
@@ -93,7 +93,7 @@ exports.deleteById = function(id, callback) {
 };
 
 exports.writeToJson = function(callback) {
-	Route.find({}).populate('targets', 'host port dead').exec(function(err, result) {
+	Route.find({}).populate('targets', 'host port source dead').exec(function(err, result) {
 		routesJson = {};
 		if (result && result != null) {
 			for ( var i = 0; i < result.length; i++) {
@@ -105,7 +105,7 @@ exports.writeToJson = function(callback) {
 				if (err) {
 					console.log(err);
 				} else {
-					console.log("The file is saved!");
+					console.log("routes.json file is saved!");
 				}
 				callback(err);
 			});
