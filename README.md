@@ -2,13 +2,15 @@
 
 ## Objective
 
-
+1. Reverse proxy
+2. Auto health monitor with dead node detection
+3. Sticky session based on cookies
 
 ## Usage
 
+1. Currently used in cloudezz as reverse proxy and load balancer
+2. Cloudezz uses rproxy restful apis to update realtime 
 
-
-## Developing
 
 ## Based On
 [Node http proxy](https://github.com/nodejitsu/node-http-proxy)
